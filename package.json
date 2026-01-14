@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "nodemon index.ts",
-    "start": "node index.ts"
+    "dev": "nodemon",
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
-    "@types/cookie-parser": "^1.4.9",
+    "@types/cookie-parser": "^1.4.10",
     "@types/cors": "^2.8.19",
     "@types/dotenv": "^6.1.1",
     "@types/express": "^5.0.3",
@@ -47,6 +47,7 @@
     "@types/passport-jwt": "^4.0.1",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
+    "tsx": "^4.21.0",
     "typescript": "^5.9.3"
   }
 }
