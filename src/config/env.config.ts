@@ -1,6 +1,6 @@
 import { getEnv } from "../utils/get_env";
 
-export const ENV = {
+export const Env = {
   NODE_ENV: getEnv("NODE_ENV", "development"),
   PORT: getEnv("PORT", "3000"),
   MONGODB_URI: getEnv("MONGO_URL", ""),

@@ -1,7 +1,7 @@
 import "dotenv/config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import { ENV } from "./config/env.config";
+import { Env } from "./config/env.config";
 import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectToDatabase from "./config/database.config";
@@ -15,7 +15,7 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
-app.use(cors({ credentials: true, origin: ENV.FRONTEND_ORIGIN }));
+app.use(cors({ credentials: true, origin: Env.FRONTEND_ORIGIN }));
 
 app.get(
   "/health",
