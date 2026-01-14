@@ -1,7 +1,9 @@
 import "dotenv/config";
 import cors from "cors";
+import passport from "passport";
 import cookieParser from "cookie-parser";
 import { Env } from "./config/env.config";
+import routes from "./routes/index.route";
 import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectToDatabase from "./config/database.config";
@@ -16,6 +18,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors({ credentials: true, origin: Env.FRONTEND_ORIGIN }));
+app.use(passport.initialize());
 
 app.get(
   "/health",
@@ -27,6 +30,8 @@ app.get(
 );
 
 app.use(errorHandler);
+
+app.use("/api", routes);
 
 app.listen(PORT, async () => {
   console.log(
