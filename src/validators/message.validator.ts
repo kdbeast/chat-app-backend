@@ -1,0 +1,13 @@
+import { z } from "zod";
+
+export const sendMessageSchema = z
+  .object({
+    chatId: z.string().trim().min(1),
+    content: z.string().trim().min(1).optional(),
+    image: z.string().trim().optional(),
+    replyToId: z.string().trim().optional(),
+  })
+  .refine((data) => data.content || data.image, {
+    message: "Content or image is required",
+    path: ["content", "image"],
+  });

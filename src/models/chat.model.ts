@@ -45,6 +45,6 @@ const chatSchema = new Schema<ChatDocument>(
   }
 );
 
-const ChatModel = model<ChatDocument>("Chat", chatSchema);
+const Chat = model<ChatDocument>("Chat", chatSchema);
 
-export default ChatModel;
+export default Chat;

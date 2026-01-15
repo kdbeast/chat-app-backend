@@ -7,4 +7,9 @@ export const Env = {
   JWT_SECRET: getEnv("JWT_SECRET", ""),
   JWT_EXPIRES_IN: getEnv("JWT_EXPIRES_IN", "1d"),
   FRONTEND_ORIGIN: getEnv("FRONTEND_ORIGIN", "http://localhost:5173"),
+
+  // cloudinary
+  CLOUDINARY_CLOUD_NAME: getEnv("CLOUDINARY_CLOUD_NAME", ""),
+  CLOUDINARY_API_KEY: getEnv("CLOUDINARY_API_KEY", ""),
+  CLOUDINARY_API_SECRET: getEnv("CLOUDINARY_API_SECRET", ""),
 } as const;
