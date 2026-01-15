@@ -3,7 +3,7 @@ import cors from "cors";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import { Env } from "./config/env.config";
-import routes from "./routes/index.route";
+import routes from "./routes";
 import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectToDatabase from "./config/database.config";
@@ -29,9 +29,8 @@ app.get(
   })
 );
 
-app.use(errorHandler);
-
 app.use("/api", routes);
+app.use(errorHandler);
 
 app.listen(PORT, async () => {
   console.log(

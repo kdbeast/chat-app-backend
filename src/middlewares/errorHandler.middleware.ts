@@ -1,10 +1,18 @@
-import { AppError } from "../utils/appError";
+import { AppError, ErrorCodes } from "../utils/appError";
 import { ErrorRequestHandler } from "express";
-import { ErrorCodes } from "../utils/appError";
 import { HTTPSTATUS } from "../config/http.config";
+import { ZodError } from "zod";
 
 export const errorHandler: ErrorRequestHandler = (err, req, res, next): any => {
   console.log(`Error occurred: ${err.path}`, err.message);
+
+  if (err instanceof ZodError) {
+    return res.status(HTTPSTATUS.BAD_REQUEST).json({
+      message: "Validation Error",
+      errorCode: ErrorCodes.ERR_BAD_REQUEST,
+      errors: err.errors,
+    });
+  }
 
   if (err instanceof AppError) {
     return res.status(err.statusCode).json({
