@@ -1,0 +1,91 @@
+import jwt from "jsonwebtoken";
+import { Env } from "../config/env.config";
+import { Server as HTTPServer } from "http";
+import { Server, type Socket } from "socket.io";
+import { validateChatParticipant } from "../services/chat.service";
+
+interface AuthenticatedSocket extends Socket {
+  userId?: string;
+}
+
+let onlineUsers = new Map<string, string>();
+
+let io: Server | null = null;
+export const initializeSocket = (httpServer: HTTPServer) => {
+  io = new Server(httpServer, {
+    cors: {
+      origin: Env.FRONTEND_ORIGIN,
+      methods: ["GET", "POST"],
+      credentials: true,
+    },
+  });
+
+  io.use(async (socket: AuthenticatedSocket, next) => {
+    try {
+      const rawCookie = socket.handshake.headers.cookie;
+      if (!rawCookie) return next(new Error("Unauthorized"));
+
+      const token = rawCookie?.split("=")?.[1]?.trim();
+      if (!token) return next(new Error("Unauthorized"));
+
+      const decoded = jwt.verify(token, Env.JWT_SECRET) as { userId: string };
+      if (!decoded) return next(new Error("Unauthorized"));
+
+      socket.userId = decoded.userId;
+
+      next();
+    } catch (error) {
+      next(new Error("Internal server error"));
+    }
+  });
+
+  io.on("connection", (socket: AuthenticatedSocket) => {
+    if (!socket.userId) {
+      socket.disconnect(true);
+      return;
+    }
+
+    const userId = socket.userId!;
+    const newSocketId = socket.id;
+
+    console.log("Socket connected:", { userId, newSocketId });
+
+    // register socket for the user
+    onlineUsers.set(userId, newSocketId);
+
+    // Broadcast online users to all sockets
+    io?.emit("onlineUsers", Array.from(onlineUsers.keys()));
+
+    // create personal room for the user
+    socket.join(`userId:${userId}`);
+
+    socket.on(
+      "chat:join",
+      async (chatId: string, callback?: (err?: string) => void) => {
+        try {
+          await validateChatParticipant(chatId, userId);
+          socket.join(`chatId:${chatId}`);
+          callback?.();
+        } catch (error) {
+          callback?.("Error joining chat");
+        }
+      }
+    );
+
+    socket.on("chat:leave", (chatId: string) => {
+      if (chatId) {
+        socket.leave(`chatId:${chatId}`);
+        console.log(`User${userId} left chat ${chatId}`);
+      }
+    });
+
+    socket.on("disconnect", () => {
+      if (onlineUsers.get(userId) === newSocketId) {
+        if (userId) onlineUsers.delete(userId);
+        io?.emit("onlineUsers", Array.from(onlineUsers.keys()));
+        
+        console.log("Socket disconnected:", { userId, newSocketId });
+      }
+    });
+  });
+};

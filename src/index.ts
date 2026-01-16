@@ -1,18 +1,23 @@
 import "dotenv/config";
 import cors from "cors";
+import http from "http";
+import routes from "./routes";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import { Env } from "./config/env.config";
-import routes from "./routes";
 import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectToDatabase from "./config/database.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
+import { initializeSocket } from "./lib/socket";
 
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+const server = http.createServer(app);
+
+initializeSocket(server);
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
@@ -32,11 +37,9 @@ app.get(
 app.use("/api", routes);
 app.use(errorHandler);
 
-app.listen(PORT, async () => {
+server.listen(PORT, async () => {
   console.log(
     `Server is running on port ${PORT} in ${process.env.NODE_ENV} mode`
   );
   await connectToDatabase();
 });
-
-export default app;

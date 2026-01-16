@@ -97,3 +97,19 @@ export const getSingleChatService = async (userId: string, chatId: string) => {
 
   return { chat, messages };
 };
+
+export const validateChatParticipant = async (
+  userId: string,
+  chatId: string
+) => {
+  const chat = await Chat.findOne({
+    _id: chatId,
+    participants: { $in: [userId] },
+  });
+
+  if (!chat) {
+    throw new BadRequestException("User not a participant of this chat");
+  }
+
+  return chat;
+};
