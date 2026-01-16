@@ -1,6 +1,7 @@
 import Chat from "../models/chat.model";
 import User from "../models/user.model";
 import Message from "../models/message.model";
+import { emitNewChatToParticipants } from "../lib/socket";
 import { NotFoundException, BadRequestException } from "../utils/appError";
 
 export const createChatService = async (
@@ -54,6 +55,14 @@ export const createChatService = async (
       "Invalid chat data. Provide participantId for single chat, or isGroup, participants, and groupName for group chat."
     );
   }
+
+  // web socket
+  const populatedChat = await chat.populate("participants", "name avatar");
+  const participantIdString = populatedChat.participants?.map((p) =>
+    p._id?.toString()
+  );
+
+  emitNewChatToParticipants(participantIdString, populatedChat);
 
   return chat;
 };

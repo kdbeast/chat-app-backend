@@ -83,9 +83,54 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       if (onlineUsers.get(userId) === newSocketId) {
         if (userId) onlineUsers.delete(userId);
         io?.emit("onlineUsers", Array.from(onlineUsers.keys()));
-        
+
         console.log("Socket disconnected:", { userId, newSocketId });
       }
     });
   });
+};
+
+function getIO() {
+  if (!io) {
+    throw new Error("Socket.io not initialized");
+  }
+  return io;
+}
+
+export const emitNewChatToParticipants = (
+  participantIds: string[] = [],
+  chat: any
+) => {
+  const io = getIO();
+  for (const participantId of participantIds) {
+    io.to(`user:${participantId}`).emit("newChat", chat);
+  }
+};
+
+export const emitNewMessageToChat = (
+  senderId: string, // userId that sent the message
+  chatId: string,
+  message: any
+) => {
+  const io = getIO();
+  const senderSocketId = onlineUsers.get(senderId);
+
+  if (senderSocketId) {
+    io.to(senderSocketId).except(senderSocketId).emit("message:new", message);
+  } else {
+    io.to(`chatId:${chatId}`).emit("message:new", message);
+  }
+};
+
+export const emitLastMessageToParticipants = (
+  participantIds: string[] = [],
+  chatId: string,
+  message: any
+) => {
+  const io = getIO();
+  const payload = { chatId, message };
+
+  for (const participantId of participantIds) {
+    io.to(`user:${participantId}`).emit("chat:update", payload);
+  }
 };
