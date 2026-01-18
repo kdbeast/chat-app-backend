@@ -25,11 +25,11 @@ export const getUserChatsController = asyncHandler(
   async (req: Request, res: Response) => {
     const userId = req.user?._id;
 
-    const chat = await getUserChatsService(userId);
+    const chats = await getUserChatsService(userId);
 
     return res
       .status(HTTPSTATUS.OK)
-      .json({ message: "User chats retrieved successfully", chat });
+      .json({ message: "User chats retrieved successfully", chats });
   }
 );
 
