@@ -154,9 +154,9 @@ export const emitChatAI = ({
     io.to(`chat:${chatId}`).emit("chat:ai", {
       chatId,
       chunk,
-      sender,
-      done: false,
+      done,
       message: null,
+      sender,
     });
     return;
   }
