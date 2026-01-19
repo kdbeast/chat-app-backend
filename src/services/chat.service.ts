@@ -84,7 +84,7 @@ export const getSingleChatService = async (userId: string, chatId: string) => {
   const chat = await Chat.findOne({
     _id: chatId,
     participants: { $in: [userId] },
-  });
+  }).populate("participants", "name avatar");
 
   if (!chat) {
     throw new NotFoundException(
