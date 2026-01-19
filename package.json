@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/kdbeast/chat-app-backend#readme",
   "dependencies": {
+    "@ai-sdk/google": "^2.0.52",
+    "ai": "^5.0.121",
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.7.0",
     "cookie-parser": "^1.4.7",

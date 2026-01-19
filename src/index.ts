@@ -5,12 +5,12 @@ import routes from "./routes";
 import passport from "passport";
 import cookieParser from "cookie-parser";
 import { Env } from "./config/env.config";
+import { initializeSocket } from "./lib/socket";
 import { HTTPSTATUS } from "./config/http.config";
 import express, { Request, Response } from "express";
 import connectToDatabase from "./config/database.config";
 import { asyncHandler } from "./middlewares/asyncHandler.middleware";
 import { errorHandler } from "./middlewares/errorHandler.middleware";
-import { initializeSocket } from "./lib/socket";
 
 const PORT = process.env.PORT || 3000;
 

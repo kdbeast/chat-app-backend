@@ -11,7 +11,7 @@ export const createChatService = async (
     isGroup?: boolean;
     participants?: string[];
     groupName?: string;
-  }
+  },
 ) => {
   const { participantId, isGroup, participants, groupName } = body;
 
@@ -26,7 +26,7 @@ export const createChatService = async (
       groupName,
       createdBy: userId,
     });
-    chat = await chat.populate("participants", "name avatar");
+    chat = await chat.populate("participants", "name avatar isAI");
   } else if (participantId) {
     const otherUser = await User.findById(participantId);
 
@@ -38,7 +38,7 @@ export const createChatService = async (
 
     const existingChat = await Chat.findOne({
       participants: { $all: allParticipantIds, $size: 2 },
-    }).populate("participants", "name avatar");
+    }).populate("participants", "name avatar isAI");
 
     if (existingChat) return existingChat;
 
@@ -47,19 +47,19 @@ export const createChatService = async (
       isGroup: false,
       createdBy: userId,
     });
-    chat = await chat.populate("participants", "name avatar");
+    chat = await chat.populate("participants", "name avatar isAI");
   }
 
   if (!chat) {
     throw new BadRequestException(
-      "Invalid chat data. Provide participantId for single chat, or isGroup, participants, and groupName for group chat."
+      "Invalid chat data. Provide participantId for single chat, or isGroup, participants, and groupName for group chat.",
     );
   }
 
   // web socket
-  const populatedChat = await chat.populate("participants", "name avatar");
+  const populatedChat = await chat.populate("participants", "name avatar isAI");
   const participantIdString = populatedChat.participants?.map((p) =>
-    p._id?.toString()
+    p._id?.toString(),
   );
 
   emitNewChatToParticipants(participantIdString, populatedChat);
@@ -69,12 +69,12 @@ export const createChatService = async (
 
 export const getUserChatsService = async (userId: string) => {
   return await Chat.find({ participants: { $in: [userId] } })
-    .populate("participants", "name avatar")
+    .populate("participants", "name avatar isAI")
     .populate({
       path: "lastMessage",
       populate: {
         path: "sender",
-        select: "name avatar",
+        select: "name avatar isAI",
       },
     })
     .sort({ updatedAt: -1 });
@@ -84,22 +84,22 @@ export const getSingleChatService = async (userId: string, chatId: string) => {
   const chat = await Chat.findOne({
     _id: chatId,
     participants: { $in: [userId] },
-  }).populate("participants", "name avatar");
+  }).populate("participants", "name avatar isAI");
 
   if (!chat) {
     throw new NotFoundException(
-      "Chat not found or you are not authorized to view this chat"
+      "Chat not found or you are not authorized to view this chat",
     );
   }
 
   const messages = await Message.find({ chatId })
-    .populate("sender", "name avatar")
+    .populate("sender", "name avatar isAI")
     .populate({
       path: "replyTo",
       select: "content image sender",
       populate: {
         path: "sender",
-        select: "name avatar",
+        select: "name avatar isAI",
       },
     })
     .sort({ createdAt: 1 });
@@ -109,7 +109,7 @@ export const getSingleChatService = async (userId: string, chatId: string) => {
 
 export const validateChatParticipant = async (
   userId: string,
-  chatId: string
+  chatId: string,
 ) => {
   const chat = await Chat.findOne({
     _id: chatId,
