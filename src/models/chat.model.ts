@@ -6,7 +6,7 @@ interface ChatDocument extends Document {
   lastMessage: mongoose.Types.ObjectId;
   isGroup: boolean;
   groupName?: string;
-  isAiChat: boolean;
+  isAIChat: boolean;
   createdBy: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
@@ -21,13 +21,11 @@ const chatSchema = new Schema<ChatDocument>(
         required: true,
       },
     ],
-    lastMessage: [
-      {
-        type: Schema.Types.ObjectId,
-        ref: "Message",
-        default: null,
-      },
-    ],
+    lastMessage: {
+      type: Schema.Types.ObjectId,
+      ref: "Message",
+      default: null,
+    },
     isGroup: {
       type: Boolean,
       default: false,
@@ -36,7 +34,7 @@ const chatSchema = new Schema<ChatDocument>(
       type: String,
       default: null,
     },
-    isAiChat: {
+    isAIChat: {
       type: Boolean,
       default: false,
     },
@@ -55,13 +53,11 @@ chatSchema.pre("save", async function (next) {
   if (this.isNew) {
     const user = mongoose.model("User");
     const participants = await User.find({
-      _id: {
-        $in: this.participants,
-        isAI: true,
-      },
+      _id: { $in: this.participants },
+      isAI: true,
     });
     if (participants.length > 0) {
-      this.isAiChat = true;
+      this.isAIChat = true;
     }
   }
   next();

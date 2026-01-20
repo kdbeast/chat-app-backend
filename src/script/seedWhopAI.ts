@@ -1,21 +1,35 @@
 import "dotenv/config";
-import UserModel from "../models/user.model";
-import connectToDatabase from "../config/database.config";
+import User from "../models/user.model.js";
+import connectToDatabase from "../config/database.config.js";
 
 export const CreateWhopAI = async () => {
-  let whopAI = await UserModel.findOne({
+  const allAI = await User.find({ isAI: true });
+  console.log("Total AI users in DB:", allAI.length);
+  allAI.forEach((u) => console.log(`- ${u.name} (${u._id})`));
+
+  let whopAI = await User.findOne({
     isAI: true,
   });
+
+  const aiName = "TalkBridge AI";
+  const aiAvatar =
+    "https://cdn.dribbble.com/userupload/13217975/file/original-2babfe49663937e748fb666c80f266f5.jpg?resize=400x0";
+
   if (whopAI) {
-    console.log("✅ WhopAI already exists");
+    whopAI.name = aiName;
+    whopAI.avatar = aiAvatar;
+    await whopAI.save();
+    console.log("✅ TalkBridge AI profile updated");
     return whopAI;
   }
-  whopAI = await UserModel.create({
-    name: "WhopAI",
+
+  whopAI = await User.create({
+    name: aiName,
+    email: "ai@talkbridge.com",
     isAI: true,
-    avatar: 'https://cdn-icons-png.flaticon.com/512/25/25231.png',
+    avatar: aiAvatar,
   });
-  console.log("✅ WhopAI created", whopAI._id);
+  console.log("✅ TalkBridge AI created", whopAI._id);
   return whopAI;
 };
 
@@ -23,10 +37,10 @@ export const seedWhopAI = async () => {
   try {
     await connectToDatabase();
     await CreateWhopAI();
-    console.log("✅ WhopAI seeded");
+    console.log("✅ TalkBridge AI seeded");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Error seeding WhopAI", error);
+    console.error("❌ Error seeding TalkBridge AI", error);
     process.exit(1);
   }
 };

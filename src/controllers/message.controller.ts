@@ -9,12 +9,13 @@ export const sendMessageController = asyncHandler(
     const userId = req.user?._id;
     const body = sendMessageSchema.parse(req.body);
 
-    const { userMessage, chat } = await sendMessageservice(userId, body);
+    const { userMessage, chat, aiResponse } = await sendMessageservice(userId, body);
 
     res.status(HTTPSTATUS.OK).json({
       message: "Message sent successfully",
       userMessage,
       chat,
+      aiResponse
     });
   }
 );

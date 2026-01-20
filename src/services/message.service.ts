@@ -92,7 +92,7 @@ export const sendMessageservice = async (
 
   let aiResponse: any = null;
 
-  if (chat.isAiChat) {
+  if (chat.isAIChat) {
     aiResponse = await getAIResponse(userId, chatId);
   }
   if (aiResponse) {
@@ -141,7 +141,7 @@ async function getAIResponse(userId: string, chatId: string) {
   });
 
   const result = await streamText({
-    model: google("gemini-2.5-flash"),
+    model: google("gemini-3-flash-preview"),
     messages: formattedMessages,
     system:
       "You are Talk Bridge AI, a helpful and friendly assistant. Respond only with text and attend to the last user message only.",

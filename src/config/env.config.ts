@@ -14,5 +14,5 @@ export const Env = {
   CLOUDINARY_API_SECRET: getEnv("CLOUDINARY_API_SECRET"),
 
   // google
-  GOOGLE_API_KEY: getEnv("GOOGLE_API_KEY"),
+  GOOGLE_API_KEY: getEnv("GOOGLE_GENERATIVE_AI_API_KEY"),
 } as const;

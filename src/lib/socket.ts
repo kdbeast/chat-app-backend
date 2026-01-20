@@ -63,7 +63,7 @@ export const initializeSocket = (httpServer: HTTPServer) => {
       "chat:join",
       async (chatId: string, callback?: (err?: string) => void) => {
         try {
-          await validateChatParticipant(chatId, userId);
+          await validateChatParticipant(userId, chatId);
           socket.join(`chatId:${chatId}`);
           console.log(`User${userId} joined chat ${chatId}`);
           callback?.();
@@ -104,7 +104,7 @@ export const emitNewChatToParticipants = (
 ) => {
   const io = getIO();
   for (const participantId of participantIds) {
-    io.to(`user:${participantId}`).emit("newChat", chat);
+    io.to(`userId:${participantId}`).emit("newChat", chat);
   }
 };
 
@@ -132,7 +132,7 @@ export const emitLastMessageToParticipants = (
   const payload = { chatId, message };
 
   for (const participantId of participantIds) {
-    io.to(`user:${participantId}`).emit("chat:update", payload);
+    io.to(`userId:${participantId}`).emit("chat:update", payload);
   }
 };
 
@@ -151,7 +151,7 @@ export const emitChatAI = ({
 }) => {
   const io = getIO();
   if (chunk?.trim() && !done) {
-    io.to(`chat:${chatId}`).emit("chat:ai", {
+    io.to(`chatId:${chatId}`).emit("chat:ai", {
       chatId,
       chunk,
       done,
@@ -162,7 +162,7 @@ export const emitChatAI = ({
   }
 
   if (done) {
-    io.to(`chat:${chatId}`).emit("chat:ai", {
+    io.to(`chatId:${chatId}`).emit("chat:ai", {
       chatId,
       chunk: null,
       sender,
